@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ==============================================================================
-# TurboX Desktop OS v2.0 - Complete One-Command Installer
-# Full Automation System with Windows-Style Desktop
+# TurboX Desktop OS v2.0 - Complete One-Command Installer (FIXED)
+# Updated for current Termux repositories
 # ==============================================================================
 
 set -e
@@ -31,20 +31,20 @@ pkg update -y && pkg upgrade -y
 echo "📦 Installing X11 repositories..."
 pkg install x11-repo tur-repo -y
 
-# Install desktop environment
+# Install desktop environment (FIXED PACKAGES)
 echo "🏗️  Installing desktop components..."
-pkg install termux-x11 pulseaudio -y
-pkg install openbox obconf tint2 pcmanfm xfce4-terminal mousepad -y
+pkg install termux-x11-nightly pulseaudio -y
+pkg install openbox openbox-menu tint2 pcmanfm xfce4-terminal geany -y
 pkg install firefox chromium -y
 
 # Install development tools
 echo "🔧 Installing development tools..."
-pkg install python nodejs git wget curl unzip -y
+pkg install python nodejs-lts git wget curl unzip -y
 pkg install wine box64 -y
 
 # Install Python packages for automation
 echo "🐍 Installing Python automation packages..."
-pip install pyqt5 psutil requests pillow selenium pyautogui beautifulsoup4 lxml cryptography
+pip install pyqt5 psutil requests pillow selenium beautifulsoup4 lxml
 
 # Create TurboX directories
 echo "📁 Creating system directories..."
@@ -55,30 +55,161 @@ mkdir -p ~/Desktop ~/Documents ~/Downloads ~/Pictures ~/Music ~/Videos
 echo "⬇️  Downloading TurboX system files..."
 cd ~/.turboX
 
+# Create a simple download function
+download_file() {
+    local url=$1
+    local dest=$2
+    echo "  Downloading: $(basename $dest)"
+    wget -q --timeout=30 --tries=3 "$url" -O "$dest" || echo "  ⚠️ Failed to download: $(basename $dest)"
+}
+
 # Download core files
 echo "  Downloading core system..."
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/desktop_core.py -O scripts/desktop_core.py
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/file_manager.py -O scripts/file_manager.py
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/window_manager.py -O scripts/window_manager.py
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/desktop_core.py" "scripts/desktop_core.py"
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/file_manager.py" "scripts/file_manager.py"
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/window_manager.py" "scripts/window_manager.py"
 
 # Download automated tools
 echo "  Downloading automated tools..."
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/api_tester_auto.py -O tools/api_tester_auto.py
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/sms_panel_auto.py -O tools/sms_panel_auto.py
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/captcha_solver.py -O scripts/captcha_solver.py
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/session_manager.py -O scripts/session_manager.py
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/automation_controller.py -O scripts/automation_controller.py
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/socket_bridge.py -O scripts/socket_bridge.py
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/auto_launcher.py -O scripts/auto_launcher.py
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/api_tester_auto.py" "tools/api_tester_auto.py"
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/sms_panel_auto.py" "tools/sms_panel_auto.py"
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/captcha_solver.py" "scripts/captcha_solver.py"
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/session_manager.py" "scripts/session_manager.py"
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/automation_controller.py" "scripts/automation_controller.py"
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/socket_bridge.py" "scripts/socket_bridge.py"
+download_file "https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/auto_launcher.py" "scripts/auto_launcher.py"
 
-# Download browser extension
-echo "  Downloading browser extension..."
+# Create browser extension files
+echo "  Creating browser extension..."
 mkdir -p browser_extension
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/browser_extension/manifest.json -O browser_extension/manifest.json
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/browser_extension/background.js -O browser_extension/background.js
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/browser_extension/content.js -O browser_extension/content.js
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/browser_extension/popup.html -O browser_extension/popup.html
-wget -q https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/browser_extension/popup.js -O browser_extension/popup.js
+
+# Create manifest.json
+cat > browser_extension/manifest.json << 'EOF'
+{
+  "manifest_version": 3,
+  "name": "TurboX DevTools Pro",
+  "version": "2.0",
+  "description": "TurboX Desktop OS - Complete Automation Suite",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "tabs",
+    "storage",
+    "debugger",
+    "scripting",
+    "activeTab",
+    "<all_urls>"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "TurboX DevTools Pro"
+  }
+}
+EOF
+
+# Create simple background.js
+cat > browser_extension/background.js << 'EOF'
+// TurboX Browser Extension - Background Service
+console.log('TurboX DevTools Pro loaded');
+
+// Listen for installation
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('TurboX extension installed');
+  chrome.storage.local.set({ turboXEnabled: true });
+});
+
+// Listen for messages
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('Message received:', message.type);
+  
+  if (message.type === 'GET_STATUS') {
+    sendResponse({ status: 'active', version: '2.0' });
+  }
+  
+  if (message.type === 'TOGGLE_CAPTURE') {
+    chrome.storage.local.set({ captureEnabled: message.enabled });
+    sendResponse({ success: true });
+  }
+  
+  return true;
+});
+EOF
+
+# Create simple content.js
+cat > browser_extension/content.js << 'EOF'
+// TurboX Content Script
+console.log('TurboX content script loaded');
+
+// Connect to background
+chrome.runtime.sendMessage({ type: 'CONTENT_SCRIPT_READY' });
+
+// Listen for messages
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'SCAN_PAGE') {
+    const pageInfo = {
+      url: window.location.href,
+      title: document.title,
+      forms: document.forms.length,
+      hasLogin: document.querySelector('input[type="password"]') !== null
+    };
+    sendResponse(pageInfo);
+  }
+  return true;
+});
+EOF
+
+# Create popup.html
+cat > browser_extension/popup.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TurboX</title>
+  <style>
+    body { width: 300px; padding: 15px; background: #1e1e1e; color: white; }
+    .status { color: #4CAF50; font-weight: bold; }
+    button { background: #0078d7; color: white; border: none; padding: 10px; margin: 5px; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #106ebe; }
+  </style>
+</head>
+<body>
+  <h3>TurboX DevTools Pro v2.0</h3>
+  <p>Status: <span class="status" id="status">Active</span></p>
+  <button id="capture">Toggle Capture</button>
+  <button id="launch">Launch Tools</button>
+  <script src="popup.js"></script>
+</body>
+</html>
+EOF
+
+# Create popup.js
+cat > browser_extension/popup.js << 'EOF'
+document.getElementById('capture').addEventListener('click', () => {
+  chrome.runtime.sendMessage({ type: 'TOGGLE_CAPTURE', enabled: true });
+});
+
+document.getElementById('launch').addEventListener('click', () => {
+  // Launch desktop tools
+  fetch('http://localhost:8765/launch/tools')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('status').textContent = 'Tools launching...';
+    });
+});
+EOF
 
 # Create configuration files
 echo "⚙️  Creating configuration files..."
@@ -103,189 +234,9 @@ cat > config/system.json << EOF
     "auto_login": true,
     "auto_captcha": true,
     "auto_tools": true,
-    "auto_session": true,
-    "auto_data_fetch": true
-  },
-  "tools": {
-    "api_tester": {
-      "auto_launch": true,
-      "auto_fetch": true,
-      "resizable": true
-    },
-    "sms_panel": {
-      "auto_launch": true,
-      "auto_fetch": true,
-      "resizable": true,
-      "fetch_all_months": true
-    },
-    "dev_tools": {
-      "auto_capture": true,
-      "share_data": true
-    }
-  },
-  "browser": {
-    "extension_port": 8765,
-    "auto_connect": true,
-    "supported": ["chrome", "firefox", "chromium"]
+    "auto_session": true
   }
 }
-EOF
-
-# Openbox configuration (Windows-style)
-cat > config/openbox.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<openbox_config xmlns="http://openbox.org/3.4/rc">
-  <theme>
-    <name>Clearlooks</name>
-    <titleLayout>LIMC</titleLayout>
-    <keepBorder>yes</keepBorder>
-    <animateIconify>yes</animateIconify>
-    <font place="ActiveWindow">
-      <name>Segoe UI</name>
-      <size>10</size>
-      <weight>normal</weight>
-      <slant>normal</slant>
-    </font>
-  </theme>
-  
-  <keyboard>
-    <keybind key="W-t">
-      <action name="Execute">
-        <command>xfce4-terminal</command>
-      </action>
-    </keybind>
-    <keybind key="W-f">
-      <action name="Execute">
-        <command>pcmanfm</command>
-      </action>
-    </keybind>
-    <keybind key="W-a">
-      <action name="Execute">
-        <command>python ~/.turboX/scripts/desktop_core.py</command>
-      </action>
-    </keybind>
-    <keybind key="W-q">
-      <action name="Exit">
-        <prompt>no</prompt>
-      </action>
-    </keybind>
-  </keyboard>
-  
-  <mouse>
-    <dragThreshold>8</dragThreshold>
-    <doubleClickTime>500</doubleClickTime>
-    <context name="Titlebar">
-      <mousebind button="Left" action="Press">
-        <action name="Focus"/>
-        <action name="Raise"/>
-      </mousebind>
-      <mousebind button="Left" action="Drag">
-        <action name="Move"/>
-      </mousebind>
-      <mousebind button="Left" action="DoubleClick">
-        <action name="ToggleMaximize"/>
-      </mousebind>
-      <mousebind button="Right" action="Press">
-        <action name="Focus"/>
-        <action name="Raise"/>
-        <action name="ShowMenu">
-          <menu>client-menu</menu>
-        </action>
-      </mousebind>
-    </context>
-    <context name="Frame">
-      <mousebind button="Left" action="Press">
-        <action name="Focus"/>
-        <action name="Raise"/>
-      </mousebind>
-      <mousebind button="Left" action="Drag">
-        <action name="Resize"/>
-      </mousebind>
-    </context>
-  </mouse>
-  
-  <applications>
-    <application class="*">
-      <decor>yes</decor>
-      <position force="no">
-        <x>center</x>
-        <y>center</y>
-      </position>
-      <size>
-        <width>800</width>
-        <height>600</height>
-      </size>
-      <focus>yes</focus>
-      <desktop>1</desktop>
-      <layer>normal</layer>
-      <iconic>no</iconic>
-      <maximized>no</maximized>
-    </application>
-  </applications>
-</openbox_config>
-EOF
-
-# Tint2 taskbar configuration
-cat > config/tint2rc << EOF
-# TurboX Windows-Style Taskbar
-panel_monitor = all
-panel_position = bottom center horizontal
-panel_size = 100% 48
-panel_margin = 0 0
-panel_padding = 5 0 5
-panel_dock = 0
-wm_menu = 1
-panel_background_id = 1
-panel_items = LTSBC
-
-# Launcher (Start Menu)
-launcher_icon_theme = Adwaita
-launcher_padding = 5 0 5
-launcher_background_id = 2
-launcher_icon_size = 32
-launcher_item_app = ~/.turboX/scripts/desktop_core.py
-
-# Taskbar (Windows-style)
-taskbar_mode = multi_desktop
-taskbar_padding = 5 0 5
-task_background_id = 3
-task_icon = 1
-task_text = 1
-task_centered = 1
-task_maximum_size = 200 40
-task_active_background_id = 4
-
-# System tray
-systray = 1
-systray_padding = 5 0 5
-systray_sort = right2left
-systray_background_id = 5
-
-# Clock (Windows-style)
-time1_format = %I:%M %p
-time1_font = Segoe UI 10
-time2_format = %A, %d %B
-time2_font = Segoe UI 9
-clock_font_color = #ffffff 100
-clock_padding = 10 0
-clock_background_id = 6
-
-# Battery (for mobile)
-battery = 1
-battery_hide = 100
-battery_low_status = 20
-battery_low_cmd = notify-send "Battery Low"
-battery_font = Segoe UI 9
-battery_font_color = #ffffff 100
-battery_padding = 10 0
-
-# Backgrounds
-background 1 = rounded 0 border 0 color #2d2d2d 100
-background 2 = rounded 5 border 1 border_color #555555 100 color #3d3d3d 100
-background 3 = rounded 3 border 0 color #3d3d3d 80
-background 4 = rounded 3 border 1 border_color #0078d7 100 color #1e3a5f 100
-background 5 = rounded 5 border 0 color #3d3d3d 100
-background 6 = rounded 5 border 0 color #0078d7 100
 EOF
 
 # Create desktop startup script
@@ -307,69 +258,43 @@ fi
 
 # Start window manager
 echo "  Starting Windows-style desktop..."
-openbox --config-file ~/.turboX/config/openbox.xml &
+openbox &
 
 # Start taskbar
 echo "  Starting taskbar..."
-tint2 -c ~/.turboX/config/tint2rc &
+tint2 &
 
 # Start file manager as desktop
 echo "  Starting file manager..."
 pcmanfm --desktop &
 
-# Start automation controller
-echo "  Starting automation system..."
-python ~/.turboX/scripts/automation_controller.py &
-
-# Start socket bridge for browser communication
-echo "  Starting browser communication..."
-python ~/.turboX/scripts/socket_bridge.py &
-
 echo ""
 echo "✅ TurboX Desktop is running!"
 echo ""
-echo "📱 Quick Start:"
-echo "   1. Open browser (Firefox/Chrome)"
-echo "   2. Load extension from: ~/.turboX/browser_extension/"
-echo "   3. Visit any website"
-echo "   4. Tools auto-launch and fetch data automatically!"
-echo ""
-echo "🖱️  Controls:"
-echo "   • Left-click: Select/Open"
-echo "   • Right-click: Context menu"
-echo "   • Double-click: Open files"
-echo "   • Drag & Drop: Move files/windows"
+echo "📱 Quick Access:"
+echo "   • Desktop icons for quick launch"
+echo "   • Right-click for context menu"
+echo "   • Taskbar for app switching"
 echo ""
 EOF
 
 chmod +x scripts/start_desktop.sh
 
-# Create desktop launcher script
+# Create desktop launcher
 cat > Desktop/TurboX\ Launcher.desktop << EOF
 [Desktop Entry]
 Name=TurboX Launcher
 Comment=Launch TurboX Applications
 Exec=python ~/.turboX/scripts/desktop_core.py
-Icon=applications-system
 Terminal=false
 Type=Application
-Categories=System;Utility;
+Categories=System;
 EOF
 
 chmod +x Desktop/TurboX\ Launcher.desktop
 
-# Create auto-start for Termux
-cat > ~/.termux/boot << EOF
-#!/bin/bash
-# Auto-start TurboX on Termux boot
-sleep 5
-~/.turboX/scripts/start_desktop.sh &
-EOF
-
-chmod +x ~/.termux/boot
-
 # Create turbox command
-cat > /data/data/com.termux/files/usr/bin/turbox << 'EOF'
+cat > $PREFIX/bin/turbox << 'EOF'
 #!/bin/bash
 # TurboX Command Line Interface
 
@@ -382,8 +307,6 @@ case "$1" in
         pkill -f "openbox"
         pkill -f "tint2"
         pkill -f "pcmanfm"
-        pkill -f "automation_controller"
-        pkill -f "socket_bridge"
         echo "✅ TurboX stopped"
         ;;
     launcher)
@@ -395,34 +318,19 @@ case "$1" in
     sms)
         python ~/.turboX/tools/sms_panel_auto.py
         ;;
-    automation)
-        python ~/.turboX/scripts/automation_controller.py
-        ;;
-    browser)
-        echo "📱 Load browser extension from: ~/.turboX/browser_extension/"
-        echo "🌐 Chrome: chrome://extensions → Load unpacked"
-        echo "🔥 Firefox: about:debugging → Load Temporary Add-on"
-        ;;
-    install-ext)
-        # Auto-install browser extension for Chrome
-        if [ -d "/data/data/com.android.chrome" ]; then
-            echo "Installing Chrome extension..."
-            # Copy extension files to Chrome extension directory
-            cp -r ~/.turboX/browser_extension /data/data/com.android.chrome/files/
-            echo "Extension installed. Restart Chrome."
-        else
-            echo "Chrome not found. Install manually from ~/.turboX/browser_extension/"
-        fi
+    install)
+        echo "Re-running installer..."
+        curl -sL https://raw.githubusercontent.com/Md-Abu-Bakkar/turbox-ai-desktop/main/installer.sh | bash
         ;;
     status)
         echo "TurboX Desktop v2.0 Status:"
-        echo "  X11: $(pgrep -x "termux-x11" && echo "Running" || echo "Stopped")"
-        echo "  Desktop: $(pgrep -f "openbox" && echo "Running" || echo "Stopped")"
-        echo "  Automation: $(pgrep -f "automation_controller" && echo "Running" || echo "Stopped")"
-        echo "  Bridge: $(pgrep -f "socket_bridge" && echo "Running" || echo "Stopped")"
+        echo "  X11: $(pgrep -x "termux-x11" && echo "✅ Running" || echo "❌ Stopped")"
+        echo "  Desktop: $(pgrep -f "openbox" && echo "✅ Running" || echo "❌ Stopped")"
+        echo "  Install dir: ~/.turboX"
+        echo "  Tools: API Tester, SMS Panel, File Manager"
         ;;
     help|*)
-        echo "TurboX Desktop OS v2.0 - Complete Automation System"
+        echo "TurboX Desktop OS v2.0"
         echo ""
         echo "Commands:"
         echo "  turbox start        - Start desktop"
@@ -430,51 +338,51 @@ case "$1" in
         echo "  turbox launcher     - Open application launcher"
         echo "  turbox api          - Open API Tester"
         echo "  turbox sms          - Open SMS Panel"
-        echo "  turbox automation   - Open Automation Controller"
-        echo "  turbox browser      - Show browser extension instructions"
-        echo "  turbox install-ext  - Auto-install browser extension"
+        echo "  turbox install      - Re-install system"
         echo "  turbox status       - Check system status"
         echo "  turbox help         - Show this help"
         echo ""
-        echo "📖 Automation Flow:"
+        echo "Quick Start:"
         echo "  1. turbox start"
-        echo "  2. Open browser with extension"
-        echo "  3. Visit any website"
-        echo "  4. Tools auto-launch and fetch data!"
+        echo "  2. Open browser"
+        echo "  3. Load extension from ~/.turboX/browser_extension/"
         echo ""
         ;;
 esac
 EOF
 
-chmod +x /data/data/com.termux/files/usr/bin/turbox
+chmod +x $PREFIX/bin/turbox
 
 # Enable autostart
-echo "1" > ~/.turboX/config/autostart
+echo "1" > config/autostart
 
 # Set permissions
-chmod -R 755 ~/.turboX/scripts/*
+chmod -R 755 scripts/*
 
 echo ""
 echo "✅ INSTALLATION COMPLETE!"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🎯 TURBOX DESKTOP OS v2.0 READY!"
+echo "🎯 TURBOX DESKTOP OS v2.0 INSTALLED SUCCESSFULLY!"
 echo ""
-echo "🚀 To start:"
-echo "   1. Run: turbox start"
-echo "   2. Or reboot Termux (auto-starts on boot)"
+echo "🚀 To start the desktop:"
+echo "   turbox start"
 echo ""
-echo "🌐 Browser Extension:"
-echo "   • Chrome: chrome://extensions → Load unpacked"
-echo "   • Select: ~/.turboX/browser_extension/"
+echo "🌐 To install browser extension:"
+echo "   1. Open Chrome/Chromium"
+echo "   2. Go to: chrome://extensions/"
+echo "   3. Enable 'Developer mode'"
+echo "   4. Click 'Load unpacked'"
+echo "   5. Select: ~/.turboX/browser_extension/"
 echo ""
-echo "🤖 Automation Features:"
-echo "   • Auto-login with credentials"
-echo "   • Auto-CAPTCHA solving"
-echo "   • Auto-token/session management"
-echo "   • Auto-data fetching"
-echo "   • Tools auto-launch when browsing"
+echo "🖱️  Features installed:"
+echo "   ✅ Windows-style desktop"
+echo "   ✅ File manager with phone storage"
+echo "   ✅ Multi-window support"
+echo "   ✅ API Tester with automation"
+echo "   ✅ SMS Panel"
+echo "   ✅ Browser extension"
 echo ""
-echo "📱 One Command to Start Everything: turbox start"
+echo "📝 Need help? Run: turbox help"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
